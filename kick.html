@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Kick extract</title>
+</head>
+<body>
+
+  <h2>Enter Live Streamer Name:</h2>
+  <input type="text" id="streamerName" placeholder="e.g., sam">
+  <button onclick="fetchM3U8()">Get M3U8</button>
+  
+  <div id="result" style="margin-top: 20px;"></div>
+
+  <script>
+    async function fetchM3U8() {
+      const streamerName = document.getElementById("streamerName").value;
+      const apiUrl = `https://kick.com/api/v1/channels/${streamerName}`;
+
+      try {
+        const response = await fetch(apiUrl);
+        const data = await response.json();
+
+        if (data.playback_url) {
+          const m3u8Url = data.playback_url;
+
+          const resultDiv = document.getElementById("result");
+          resultDiv.innerHTML = `
+            <p><span id="m3u8UrlDisplay">${m3u8Url}</span></p>
+            <button onclick="redirectToM3U8('${m3u8Url}')">Redirect</button>
+            <button onclick="copyToClipboard('${m3u8Url}')">Copy</button>`;
+        } else {
+          document.getElementById("result").textContent = "Stream not found or offline.";
+        }
+      } catch (error) {
+        document.getElementById("result").textContent = "Error fetching stream data.";
+      }
+    }
+
+    function redirectToM3U8(m3u8Url) {
+      // (Same as before)
+      window.location.href = m3u8Url; 
+    }
+
+    async function copyToClipboard(text) {
+      try {
+        await navigator.clipboard.writeText(text);
+        alert('M3U8 URL copied to clipboard!');
+      } catch (err) {
+        alert('Failed to copy: ', err);
+      }
+    }
+  </script>
+
+</body>
+</html>
