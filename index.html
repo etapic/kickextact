@@ -4,7 +4,10 @@
   <title>Kick extract</title>
 </head>
 <body>
+  <h2>Pre-set Streamers:</h2>
+  <div id="presetLinks"></div> 
 
+  
   <h2>Enter Live Streamer Name:</h2>
   <input type="text" id="streamerName" placeholder="e.g., sam">
   <button onclick="fetchM3U8()">Get M3U8</button>
@@ -12,9 +15,23 @@
   <div id="result" style="margin-top: 20px;"></div>
 
   <script>
-    async function fetchM3U8() {
-      const streamerName = document.getElementById("streamerName").value;
-      const apiUrl = `https://kick.com/api/v1/channels/${streamerName}`;
+
+    const presetStreamers = ["sam", "suspendas", "kangjoel"];
+    function createPresetLinks() {
+      const linksContainer = document.getElementById("presetLinks");
+      presetStreamers.forEach(name => {
+        const link = document.createElement("a");
+        link.href = "#"; 
+        link.textContent = name;
+        link.onclick = () => fetchM3U8(name, true); 
+        linksContainer.appendChild(link);
+      });
+    }
+    
+
+    async function fetchM3U8(streamerName = null, redirect = false) {
+      const name = streamerName || document.getElementById("streamerName").value;
+      const apiUrl = `https://kick.com/api/v1/channels/${name}`;
 
       try {
         const response = await fetch(apiUrl);
@@ -23,11 +40,15 @@
         if (data.playback_url) {
           const m3u8Url = data.playback_url;
 
-          const resultDiv = document.getElementById("result");
-          resultDiv.innerHTML = `
-            <p><span id="m3u8UrlDisplay">${m3u8Url}</span></p>
-            <button onclick="redirectToM3U8('${m3u8Url}')">Redirect</button>
-            <button onclick="copyToClipboard('${m3u8Url}')">Copy</button>`;
+          if (redirect) {
+            redirectToM3U8(m3u8Url);
+          } else {
+            const resultDiv = document.getElementById("result");
+            resultDiv.innerHTML = `
+              <p>M3U8 URL: <span id="m3u8UrlDisplay">${m3u8Url}</span></p>
+              <button onclick="redirectToM3U8('${m3u8Url}')">Redirect</button>
+              <button onclick="copyToClipboard('${m3u8Url}')">Copy</button>`;
+          }
         } else {
           document.getElementById("result").textContent = "Stream not found or offline.";
         }
@@ -48,6 +69,8 @@
         alert('Failed to copy: ', err);
       }
     }
+
+     createPresetLinks(); 
   </script>
 
 </body>
