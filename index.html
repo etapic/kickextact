@@ -4,26 +4,25 @@
   <title>Kick extract</title>
     <style>
     #presetLinks a {
-      display: block; /* Make each link take up a whole line */
-      margin-bottom: 5px; /* Add some spacing between links */
+      display: block; 
+      margin-bottom: 5px; 
     }
   </style>
   
 </head>
 <body>
-  <h2>Pre-set Streamers:</h2>
   <div id="presetLinks"></div> 
 
   
   <h2>Enter Live Streamer Name:</h2>
-  <input type="text" id="streamerName" placeholder="e.g., sam">
+  <input type="text" id="streamerName">
   <button onclick="fetchM3U8()">Get M3U8</button>
   
   <div id="result" style="margin-top: 20px;"></div>
 
   <script>
 
-    const presetStreamers = ["sam", "suspendas", "kangjoel"];
+    const presetStreamers = ["sam", "suspendas", "kangjoel", "ac7ionman", "shakomako", "carldo", "nedx", "n3on", "iceposeidon", "cristravels", "nataliereynolds", "nickwhite", "hanridge", "deepak", "taemin1998", "hood_priest", "captaingee", "ddurantv", "vitaly", "adinross"];
     function createPresetLinks() {
       const linksContainer = document.getElementById("presetLinks");
       presetStreamers.forEach(name => {
@@ -52,7 +51,7 @@
           } else {
             const resultDiv = document.getElementById("result");
             resultDiv.innerHTML = `
-              <p>M3U8 URL: <span id="m3u8UrlDisplay">${m3u8Url}</span></p>
+              <p><span id="m3u8UrlDisplay">${m3u8Url}</span></p>
               <button onclick="redirectToM3U8('${m3u8Url}')">Redirect</button>
               <button onclick="copyToClipboard('${m3u8Url}')">Copy</button>`;
           }
