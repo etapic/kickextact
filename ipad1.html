@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Kick extract v3</title>
+  <title>Kick extract v5</title>
   <style>
     #presetLinks a {
       display: block; 
@@ -70,8 +70,16 @@
         }
       };
       xhr.onerror = function() {
-        document.getElementById("result").textContent = "Network error.";
+        var errorMessage = "Network error";
+        if (xhr.status === 0) {
+          errorMessage += ": Unable to reach the server. Please check your internet connection.";
+        }
+        document.getElementById("result").textContent = errorMessage;
       };
+      xhr.ontimeout = function() {
+        document.getElementById("result").textContent = "Request timed out.";
+      };
+      xhr.timeout = 5000; // Set a timeout for the request
       xhr.send();
     }
 
