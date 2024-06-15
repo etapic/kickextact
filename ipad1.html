@@ -1,14 +1,13 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Kick extract</title>
-    <style>
+  <title>Kick extract v2</title>
+  <style>
     #presetLinks a {
       display: block; 
       margin-bottom: 5px; 
     }
   </style>
-   <script src="https://cdnjs.cloudflare.com/ajax/libs/es5-shim/4.5.14/es5-shim.min.js"></script>
 </head>
 <body>
   <div id="presetLinks"></div> 
@@ -19,63 +18,65 @@
   <div id="result" style="margin-top: 20px;"></div>
 
   <script>
+    var presetStreamers = ["slightlyhomeless", "moxie", "sjc_official", "sam", "suspendas", "kangjoel", "ac7ionman", "shakomako", "carldo", "nedx", "n3on", "iceposeidon", "cristravels", "nataliereynolds", "nickwhite", "hanridge", "deepak", "taemin1998", "hood_priest", "captaingee", "ddurantv", "vitaly", "adinross"];
 
-    const presetStreamers = ["slightlyhomeless","moxie","sjc_official","sam", "suspendas", "kangjoel", "ac7ionman", "shakomako", "carldo", "nedx", "n3on", "iceposeidon", "cristravels", "nataliereynolds", "nickwhite", "hanridge", "deepak", "taemin1998", "hood_priest", "captaingee", "ddurantv", "vitaly", "adinross"];
     function createPresetLinks() {
-      const linksContainer = document.getElementById("presetLinks");
-      presetStreamers.forEach(name => {
-        const link = document.createElement("a");
-        link.href = "#"; 
+      var linksContainer = document.getElementById("presetLinks");
+      for (var i = 0; i < presetStreamers.length; i++) {
+        var name = presetStreamers[i];
+        var link = document.createElement("a");
+        link.href = "#";
         link.textContent = name;
-        link.onclick = () => fetchM3U8(name, true); 
+        link.onclick = (function(name) {
+          return function() {
+            fetchM3U8(name, true);
+          };
+        })(name);
         linksContainer.appendChild(link);
-      });
-    }
-    
-
-    async function fetchM3U8(streamerName = null, redirect = false) {
-      const name = streamerName || document.getElementById("streamerName").value;
-      const apiUrl = `https://kick.com/api/v1/channels/${name}`;
-
-      try {
-        const response = await fetch(apiUrl);
-        const data = await response.json();
-
-        if (data.playback_url) {
-          const m3u8Url = data.playback_url;
-
-          if (redirect) {
-            redirectToM3U8(m3u8Url);
-          } else {
-            const resultDiv = document.getElementById("result");
-            resultDiv.innerHTML = `
-              <p><span id="m3u8UrlDisplay">${m3u8Url}</span></p>
-              <button onclick="redirectToM3U8('${m3u8Url}')">Redirect</button>
-              <button onclick="copyToClipboard('${m3u8Url}')">Copy</button>`;
-          }
-        } else {
-          document.getElementById("result").textContent = "Stream not found or offline.";
-        }
-      } catch (error) {
-        document.getElementById("result").textContent = "Error fetching stream data.";
       }
+    }
+
+    function fetchM3U8(streamerName, redirect) {
+      var name = streamerName || document.getElementById("streamerName").value;
+      var apiUrl = "https://kick.com/api/v1/channels/" + name;
+
+      var xhr = new XMLHttpRequest();
+      xhr.open("GET", apiUrl, true);
+      xhr.onreadystatechange = function() {
+        if (xhr.readyState == 4) {
+          if (xhr.status == 200) {
+            var data = JSON.parse(xhr.responseText);
+            if (data.playback_url) {
+              var m3u8Url = data.playback_url;
+
+              if (redirect) {
+                redirectToM3U8(m3u8Url);
+              } else {
+                var resultDiv = document.getElementById("result");
+                resultDiv.innerHTML = '<p><span id="m3u8UrlDisplay">' + m3u8Url + '</span></p>' +
+                                      '<button onclick="redirectToM3U8(\'' + m3u8Url + '\')">Redirect</button>' +
+                                      '<button onclick="copyToClipboard(\'' + m3u8Url + '\')">Copy</button>';
+              }
+            } else {
+              document.getElementById("result").textContent = "Stream not found or offline.";
+            }
+          } else {
+            document.getElementById("result").textContent = "Error fetching stream data.";
+          }
+        }
+      };
+      xhr.send();
     }
 
     function redirectToM3U8(m3u8Url) {
-      window.location.href = m3u8Url; 
+      window.location.href = m3u8Url;
     }
 
-    async function copyToClipboard(text) {
-      try {
-        await navigator.clipboard.writeText(text);
-        alert('M3U8 URL copied to clipboard!');
-      } catch (err) {
-        alert('Failed to copy: ', err);
-      }
+    function copyToClipboard(text) {
+      window.prompt("Copy to clipboard: Ctrl+C, Enter", text);
     }
 
-     createPresetLinks(); 
+    createPresetLinks();
   </script>
-
 </body>
 </html>
