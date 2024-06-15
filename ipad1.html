@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Kick extract v5</title>
+  <title>Kick extract v6</title>
   <style>
     #presetLinks a {
       display: block; 
@@ -61,6 +61,10 @@
               } else {
                 document.getElementById("result").textContent = "Stream not found or offline.";
               }
+              // Print headers
+              var headers = xhr.getAllResponseHeaders();
+              console.log("Response Headers:\n" + headers);
+              document.getElementById("result").innerHTML += '<pre>' + headers + '</pre>';
             } catch (e) {
               document.getElementById("result").textContent = "Error parsing stream data.";
             }
