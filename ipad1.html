@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Kick extract v2</title>
+  <title>Kick extract v3</title>
   <style>
     #presetLinks a {
       display: block; 
@@ -45,25 +45,32 @@
       xhr.onreadystatechange = function() {
         if (xhr.readyState == 4) {
           if (xhr.status == 200) {
-            var data = JSON.parse(xhr.responseText);
-            if (data.playback_url) {
-              var m3u8Url = data.playback_url;
+            try {
+              var data = JSON.parse(xhr.responseText);
+              if (data.playback_url) {
+                var m3u8Url = data.playback_url;
 
-              if (redirect) {
-                redirectToM3U8(m3u8Url);
+                if (redirect) {
+                  redirectToM3U8(m3u8Url);
+                } else {
+                  var resultDiv = document.getElementById("result");
+                  resultDiv.innerHTML = '<p><span id="m3u8UrlDisplay">' + m3u8Url + '</span></p>' +
+                                        '<button onclick="redirectToM3U8(\'' + m3u8Url + '\')">Redirect</button>' +
+                                        '<button onclick="copyToClipboard(\'' + m3u8Url + '\')">Copy</button>';
+                }
               } else {
-                var resultDiv = document.getElementById("result");
-                resultDiv.innerHTML = '<p><span id="m3u8UrlDisplay">' + m3u8Url + '</span></p>' +
-                                      '<button onclick="redirectToM3U8(\'' + m3u8Url + '\')">Redirect</button>' +
-                                      '<button onclick="copyToClipboard(\'' + m3u8Url + '\')">Copy</button>';
+                document.getElementById("result").textContent = "Stream not found or offline.";
               }
-            } else {
-              document.getElementById("result").textContent = "Stream not found or offline.";
+            } catch (e) {
+              document.getElementById("result").textContent = "Error parsing stream data.";
             }
           } else {
-            document.getElementById("result").textContent = "Error fetching stream data.";
+            document.getElementById("result").textContent = "Error fetching stream data. Status: " + xhr.status;
           }
         }
+      };
+      xhr.onerror = function() {
+        document.getElementById("result").textContent = "Network error.";
       };
       xhr.send();
     }
